@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #a2c2e2, #d9e7f1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        input[type="text"] {
+            width: calc(100% - 24px);
+            padding: 15px;
+            font-size: 16px;
+            border: 2px solid #007bff;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            border-color: #0056b3;
+        }
+        button {
+            background-color: #007bff;
+            color: #ffffff;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 8px;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        #qrcode {
+            margin: 20px 0;
+        }
+        #qrcode img {
+            max-width: 100%;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+        }
+        footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>QR Code Generator</h1>
+        <input type="text" id="text-input" placeholder="Enter text or URL">
+        <div id="qrcode"></div>
+        <button id="save-btn" onclick="saveQRCode()" disabled>Save QR Code</button>
+        <button id="share-btn" onclick="shareQRCode()" disabled>Share QR Code</button>
+        <button onclick="clearQRCode()">Clear</button>
+    </div>
+
+    <footer>
+        Powered by <a href="#">Falendra Sahu ❤️</a>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <script>
+        function generateQRCode(text) {
+            const saveBtn = document.getElementById('save-btn');
+            const shareBtn = document.getElementById('share-btn');
+            const qrcodeDiv = document.getElementById('qrcode');
+
+            if (text) {
+                QRCode.toDataURL(text, function (err, url) {
+                    if (err) console.error(err);
+                    qrcodeDiv.innerHTML = `<img src="${url}" alt="QR Code" id="qrcode-img">`;
+                    saveBtn.disabled = false;
+                    shareBtn.disabled = false;
+                });
+            } else {
+                qrcodeDiv.innerHTML = ''; // Clear QR code if no text
+                saveBtn.disabled = true;
+                shareBtn.disabled = true;
+            }
+        }
+
+        document.getElementById('text-input').addEventListener('input', function() {
+            const text = this.value;
+            generateQRCode(text);
+        });
+
+        function saveQRCode() {
+            const img = document.getElementById('qrcode-img');
+            if (img) {
+                const link = document.createElement('a');
+                link.href = img.src;
+                link.download = 'qrcode.png';
+                link.click();
+            } else {
+                alert('No QR code to save.');
+            }
+        }
+
+        function shareQRCode() {
+            const img = document.getElementById('qrcode-img');
+            if (img) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'QR Code',
+                        text: 'Here is your QR code:',
+                        url: img.src,
+                    }).catch(console.error);
+                } else {
+                    alert('Share feature not supported on this browser.');
+                }
+            } else {
+                alert('No QR code to share.');
+            }
+        }
+
+        function clearQRCode() {
+            document.getElementById('text-input').value = '';
+            document.getElementById('qrcode').innerHTML = '';
+            document.getElementById('save-btn').disabled = true;
+            document.getElementById('share-btn').disabled = true;
+        }
+    </script>
+</body>
+</html>
